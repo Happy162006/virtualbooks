@@ -1,60 +1,165 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dashboard</title>
-    <link rel="shortcut icon" th:href="@{/img/book.png}" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Usuario</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="flex h-screen font-sans bg-gray-100 text-gray-700">
+<body class="bg-gray-100">
 
-<!-- Incluir menú lateral -->
 <div th:replace="fragments/sidebar :: sidebar"></div>
 
-<main class="flex-1 lg:pl-64 p-8 overflow-y-auto">
-    <div class="border-b-4 border-red-700 mb-8 pb-4">
-        <h3 class="text-3xl font-semibold">Hola, <span th:text="${usuario.nombre}"></span></h3>
-    </div>
+<div class="container mx-auto mt-12 lg:ml-72 px-4 sm:px-6 lg:px-8">
 
-    <!-- Contadores -->
-    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-        <div class="bg-white shadow-md rounded-lg p-6 flex items-center space-x-6 border border-gray-300">
-            <img class="h-14 w-14" th:src="@{/svg/bookmark.svg}" alt="Libros" />
-            <div>
-                <h4 class="text-xl font-semibold text-gray-800 mb-1">Libros</h4>
-                <p class="text-3xl font-bold text-gray-700" th:text="${#lists.size(libros)}"></p>
+    <div class="flex flex-col lg:flex-row justify-between gap-6 mb-10">
+        <div class="lg:w-2/3 flex flex-col justify-between gap-4">
+            <h1 class="text-3xl font-bold mb-2">Bienvenido, <span th:text="${usuario.nombre}"></span></h1>
+            <p class="text-gray-500">Explora tus libros, autores y categorías</p>
+            <div class="flex flex-wrap gap-4 mt-4">
+                <a th:href="@{/user/libros}" class="bg-red-600 text-white px-6 py-3 rounded-xl shadow hover:scale-105 transition font-medium">Agregar Libro</a>
+                <a th:href="@{/user/autores}" class="bg-green-600 text-white px-6 py-3 rounded-xl shadow hover:scale-105 transition font-medium">Agregar Autor</a>
             </div>
         </div>
-    </section>
-
-    <!-- Historial -->
-    <section class="bg-white p-6 rounded-2xl shadow-lg border border-gray-300">
-        <h2 class="text-xl font-semibold mb-6 text-red-700">Últimos Libros Añadidos</h2>
-        <div class="overflow-x-auto">
-            <table class="min-w-full table-auto border-collapse border border-gray-300 rounded-lg overflow-hidden">
-                <thead class="bg-red-50">
-                <tr>
-                    <th class="text-left py-3 px-6 border-b border-gray-300">Título</th>
-                    <th class="text-left py-3 px-6 border-b border-gray-300">Categoría</th>
-                    <th class="text-left py-3 px-6 border-b border-gray-300">Autor</th>
-                    <th class="text-left py-3 px-6 border-b border-gray-300">Fecha Añadido</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="libro : ${libros}" class="hover:bg-red-50 transition-colors duration-200">
-                    <td class="py-3 px-6 border-b border-gray-200" th:text="${libro.titulo}"></td>
-                    <td class="py-3 px-6 border-b border-gray-200" th:text="${libro.category != null ? libro.category.nombre : 'Sin categoría'}"></td>
-                    <td class="py-3 px-6 border-b border-gray-200" th:text="${libro.author != null ? libro.author.nombre : 'Sin autor'}"></td>
-                    <!-- Cambiado #dates por #temporals -->
-                    <td class="py-3 px-6 border-b border-gray-200" th:text="${#temporals.format(libro.createdAt, 'dd/MM/yyyy')}"></td>
-                </tr>
-                </tbody>
-            </table>
+        <div class="bg-white shadow-xl rounded-2xl p-6 flex flex-col justify-center items-center w-full lg:w-1/3">
+            <p class="text-gray-500 font-medium mb-2">Fecha y hora actual</p>
+            <p class="text-2xl font-bold" id="fechaHora"></p>
         </div>
-    </section>
-</main>
+    </div>
+
+    <div class="relative grid grid-cols-1 sm:grid-cols-3 gap-6 mb-12">
+        <div class="bg-white shadow-xl rounded-2xl p-6 text-center transform hover:scale-105 transition relative -top-4">
+            <h2 class="text-xl font-semibold">Libros</h2>
+            <p class="text-3xl font-bold mt-2 text-red-600" th:text="${cantidadLibros}">0</p>
+        </div>
+        <div class="bg-white shadow-xl rounded-2xl p-6 text-center transform hover:scale-105 transition relative -top-2">
+            <h2 class="text-xl font-semibold">Autores</h2>
+            <p class="text-3xl font-bold mt-2 text-green-600" th:text="${cantidadAutores}">0</p>
+        </div>
+        <div class="bg-white shadow-xl rounded-2xl p-6 text-center transform hover:scale-105 transition">
+            <h2 class="text-xl font-semibold">Categorías</h2>
+            <p class="text-3xl font-bold mt-2 text-blue-600" th:text="${cantidadCategorias}">0</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-12">
+        <div class="bg-white p-4 rounded-2xl shadow-xl flex flex-col items-center">
+            <h3 class="text-lg font-semibold mb-2">Libros por categoría</h3>
+            <canvas id="graficoLibros" width="250" height="180"></canvas>
+        </div>
+        <div class="bg-white p-4 rounded-2xl shadow-xl flex flex-col items-center">
+            <h3 class="text-lg font-semibold mb-2">Autores y cantidad de libros</h3>
+            <canvas id="graficoAutores" width="250" height="180"></canvas>
+        </div>
+        <div class="bg-white p-4 rounded-2xl shadow-xl flex flex-col items-center">
+            <h3 class="text-lg font-semibold mb-2">Distribución de categorías</h3>
+            <canvas id="graficoCategorias" width="250" height="180"></canvas>
+        </div>
+    </div>
+
+
+    <!-- Historial de últimos agregados estilo masonry -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+        <!-- Últimos Libros -->
+        <div class="bg-white shadow-xl rounded-2xl p-6 hover:shadow-2xl transition">
+            <h3 class="text-xl font-semibold mb-4">Últimos Libros</h3>
+            <ul class="space-y-3">
+                <li th:each="libro : ${ultimosLibros}" class="border-l-4 border-red-500 pl-3 py-1">
+                    <span class="font-medium text-gray-700" th:text="${libro.titulo}"></span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Últimos Autores -->
+        <div class="bg-white shadow-xl rounded-2xl p-6 hover:shadow-2xl transition">
+            <h3 class="text-xl font-semibold mb-4">Últimos Autores</h3>
+            <ul class="space-y-3">
+                <li th:each="autor : ${ultimosAutores}" class="border-l-4 border-green-500 pl-3 py-1">
+                    <span class="font-medium text-gray-700" th:text="${autor.nombre}"></span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Últimas Categorías -->
+        <div class="bg-white shadow-xl rounded-2xl p-6 hover:shadow-2xl transition">
+            <h3 class="text-xl font-semibold mb-4">Últimas Categorías</h3>
+            <ul class="space-y-3">
+                <li th:each="cat : ${ultimasCategorias}" class="border-l-4 border-blue-500 pl-3 py-1">
+                    <span class="font-medium text-gray-700" th:text="${cat.nombre}"></span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    const categorias = /*[[${categorias}]]*/ [];
+    const libros = /*[[${libros}]]*/ [];
+    const autores = /*[[${autores}]]*/ [];
+
+    const librosPorCategoria = categorias.map(c => libros.filter(l => l.category && l.category.id === c.id).length);
+
+    new Chart(document.getElementById('graficoLibros').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: categorias.map(c => c.nombre),
+            datasets: [{
+                label: 'Libros por categoría',
+                data: librosPorCategoria,
+                backgroundColor: 'rgba(220, 38, 38, 0.7)'
+            }]
+        },
+        options: {
+            responsive: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { ticks: { font: { size: 10 } } },
+                y: { ticks: { font: { size: 10 }, beginAtZero: true } }
+            }
+        }
+    });
+
+    new Chart(document.getElementById('graficoAutores').getContext('2d'), {
+        type: 'pie',
+        data: {
+            labels: autores.map(a => a.nombre),
+            datasets: [{
+                data: autores.map(a => libros.filter(l => l.author && l.author.id === a.id).length),
+                backgroundColor: autores.map(() => 'rgba(' + Math.floor(Math.random()*255) + ',' + Math.floor(Math.random()*255) + ',220,0.7)')
+            }]
+        },
+        options: { responsive: false }
+    });
+
+    new Chart(document.getElementById('graficoCategorias').getContext('2d'), {
+        type: 'doughnut',
+        data: {
+            labels: categorias.map(c => c.nombre),
+            datasets: [{
+                data: categorias.map(c => libros.filter(l => l.category && l.category.id === c.id).length),
+                backgroundColor: categorias.map(() => 'rgba(' + Math.floor(Math.random()*220) + ',220,' + Math.floor(Math.random()*220) + ',0.7)')
+            }]
+        },
+        options: { responsive: false }
+    });
+</script>
+
+<script>
+    function actualizarHora() {
+        const fecha = new Date();
+        const utc6 = new Date(fecha.getTime() - (fecha.getTimezoneOffset() * 60000) - 6*60*60000);
+        const dia = String(utc6.getDate()).padStart(2,'0');
+        const mes = String(utc6.getMonth()+1).padStart(2,'0');
+        const anio = utc6.getFullYear();
+        const hora = String(utc6.getHours()).padStart(2,'0');
+        const minuto = String(utc6.getMinutes()).padStart(2,'0');
+        document.getElementById('fechaHora').textContent = `${dia}/${mes}/${anio} ${hora}:${minuto}`;
+    }
+
+    actualizarHora();
+    setInterval(actualizarHora, 60000);
+</script>
 
 </body>
 </html>

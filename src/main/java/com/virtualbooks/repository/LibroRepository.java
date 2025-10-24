@@ -8,9 +8,7 @@ import java.util.List;
 @Repository
 public interface LibroRepository extends JpaRepository<Libro, Long> {
 
-    // Todos los libros de un usuario
-    List<Libro> findByUserId(Long userId);
-
-    // Solo libros favoritos de un usuario
     List<Libro> findByUserIdAndFavoritoTrue(Long userId);
+    List<Libro> findTop5ByUserIdOrderByIdDesc(Long userId);
+    List<Libro> findByUserId(Long userId);
 }
