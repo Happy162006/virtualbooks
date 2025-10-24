@@ -36,6 +36,9 @@ public class Libro {
 
     private String imagen;
 
+    @Column(name = "favorito")
+    private boolean favorito = false; // ✅ Nuevo campo para marcar como favorito
+
     @CreationTimestamp
     private LocalDateTime createdAt;  // Fecha de creación automática
 

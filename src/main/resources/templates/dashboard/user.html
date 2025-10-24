@@ -47,7 +47,8 @@
                     <td class="py-3 px-6 border-b border-gray-200" th:text="${libro.titulo}"></td>
                     <td class="py-3 px-6 border-b border-gray-200" th:text="${libro.category != null ? libro.category.nombre : 'Sin categoría'}"></td>
                     <td class="py-3 px-6 border-b border-gray-200" th:text="${libro.author != null ? libro.author.nombre : 'Sin autor'}"></td>
-                    <td class="py-3 px-6 border-b border-gray-200" th:text="${#dates.format(libro.createdAt, 'dd/MM/yyyy')}"></td>
+                    <!-- Cambiado #dates por #temporals -->
+                    <td class="py-3 px-6 border-b border-gray-200" th:text="${#temporals.format(libro.createdAt, 'dd/MM/yyyy')}"></td>
                 </tr>
                 </tbody>
             </table>

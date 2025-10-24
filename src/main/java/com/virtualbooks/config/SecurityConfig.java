@@ -33,13 +33,15 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/css/**", "/js/**", "/img/**").permitAll()
+                        // Permitir acceso a la raíz, login, registro y recursos estáticos
+                        .requestMatchers("/", "/index", "/auth/**", "/css/**", "/js/**", "/img/**").permitAll()
+                        // Todo lo demás requiere autenticación
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                        .loginPage("/auth/login")
-                        .loginProcessingUrl("/login")
-                        .defaultSuccessUrl("/dashboard", true)
+                        .loginPage("/auth/login")       // Página de login personalizada
+                        .loginProcessingUrl("/login")   // URL que procesa el login
+                        .defaultSuccessUrl("/dashboard", true) // A dónde ir después de login
                         .failureUrl("/auth/login?error=true")
                         .permitAll()
                 )
@@ -48,6 +50,9 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/auth/login?logout=true")
                         .permitAll()
                 );
+
         return http.build();
     }
+
+
 }

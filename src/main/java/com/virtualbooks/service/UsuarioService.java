@@ -30,4 +30,10 @@ public class UsuarioService {
         usuario.setRol(0);
         return usuarioRepository.save(usuario);
     }
+
+    // 🔑 Nuevo método para obtener usuario por email
+    public Usuario obtenerPorEmail(String email) {
+        return usuarioRepository.findByEmail(email);
+    }
 }
+

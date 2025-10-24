@@ -12,103 +12,103 @@
     <meta name="_csrf_header" th:content="${_csrf.headerName}" />
 </head>
 <body class="bg-gray-100">
-<!-- Incluir menú lateral -->
 <div th:replace="fragments/sidebar :: sidebar"></div>
-<div class="container mx-auto mt-12">
-    <h1 class="text-3xl font-bold text-center mb-8">Mis Autores</h1>
 
-    <!-- Botón agregar -->
-    <div class="flex justify-end mb-4">
-        <button onclick="abrirModalAgregar()"
-                class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
-            Agregar Autor
-        </button>
+<div class="container mx-auto mt-12 lg:ml-72 px-4 sm:px-6 lg:px-8">
+
+    <!-- Encabezado y búsqueda al estilo Categorías -->
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold">Autores</h1>
+        <div class="flex items-center space-x-4">
+            <form method="GET" action="" class="flex items-center space-x-4">
+                <input type="text" name="buscar" placeholder="Buscar..."
+                       class="border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-purple-600">
+            </form>
+            <button onclick="abrirModalAgregar()"
+                    class="bg-red-600 text-white py-2 px-6 rounded-lg hover:bg-red-700 shadow-md transition duration-300">
+                AGREGAR
+            </button>
+        </div>
     </div>
 
-    <!-- Tabla autores -->
-    <div class="overflow-x-auto">
-        <table class="min-w-full bg-white shadow rounded-lg">
-            <thead class="bg-green-500 text-white">
-            <tr>
-                <th class="py-2 px-4">ID</th>
-                <th class="py-2 px-4">Nombre</th>
-                <th class="py-2 px-4">Nacionalidad</th>
-                <th class="py-2 px-4">Fecha de Nacimiento</th>
-                <th class="py-2 px-4">Acciones</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="autor : ${autores}" class="border-b">
-                <td class="py-2 px-4" th:text="${autor.id}"></td>
-                <td class="py-2 px-4" th:text="${autor.nombre}"></td>
-                <td class="py-2 px-4" th:text="${autor.nacionalidad}"></td>
-                <td class="py-2 px-4" th:text="${autor.fechaNacido}"></td>
-                <td class="py-2 px-4 space-x-2">
-                    <button th:onclick="'abrirModalEditar(' + ${autor.id} + ')'"
-                            class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded">
+    <!-- Tarjetas de autores -->
+    <div th:if="${autores.size() > 0}" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        <div th:each="autor : ${autores}" class="bg-white p-4 sm:p-6 rounded-3xl shadow-xl hover:shadow-2xl transition-shadow duration-300 flex flex-col sm:flex-row items-center">
+            <!-- Foto -->
+            <div th:if="${autor.imagen != null && autor.imagen != ''}" class="flex-shrink-0 mb-4 sm:mb-0">
+                <img th:src="@{${autor.imagen}}" alt="Foto de autor" class="w-32 h-32 sm:w-32 sm:h-32 object-cover rounded-xl mx-auto sm:mx-0">
+            </div>
+            <div th:if="${autor.imagen == null || autor.imagen == ''}" class="w-32 h-32 sm:w-32 sm:h-32 bg-gray-200 flex items-center justify-center rounded-xl text-gray-500 flex-shrink-0 mx-auto sm:mx-0 mb-4 sm:mb-0">
+                Sin foto
+            </div>
+
+            <!-- Información -->
+            <div class="flex-1 sm:ml-6 text-center sm:text-left">
+                <h2 class="text-xl sm:text-2xl font-semibold text-red-800 mb-1" th:text="${autor.nombre}"></h2>
+                <p class="text-sm sm:text-base text-gray-600 mb-3" th:text="'Nacionalidad: ' + ${autor.nacionalidad}"></p>
+
+                <!-- Botones -->
+                <div class="flex flex-col sm:flex-row justify-center sm:justify-start space-y-2 sm:space-y-0 sm:space-x-2">
+                    <button th:onclick="'abrirModalEditar(' + ${autor.id} + ')' "
+                            class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-xl shadow-md transition duration-200 text-sm sm:text-base">
                         Editar
                     </button>
-                    <form th:action="@{'/user/autores/eliminar/' + ${autor.id}}" method="post" class="inline">
-                        <input type="hidden" name="_csrf" th:value="${_csrf.token}">
-                        <button type="submit"
-                                class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded">
-                            Eliminar
-                        </button>
-                    </form>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+                    <button th:onclick="'eliminarAutor(' + ${autor.id} + ')' "
+                            class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl shadow-md transition duration-200 text-sm sm:text-base">
+                        Eliminar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mensaje si no hay autores -->
+    <div th:if="${autores.size() == 0}" class="text-center text-gray-500 mt-12 text-lg sm:text-xl">
+        Aún no hay autores
     </div>
 </div>
 
 <script>
     const csrfToken = document.querySelector('meta[name="_csrf"]').content;
 
-    // Modal agregar
+    const swalInputClass = 'swal2-input block w-full max-w-xs px-4 py-2 border border-gray-300 rounded-xl shadow-md focus:outline-none focus:ring-2 focus:ring-red-500 transition duration-200 mx-auto';
+
     function abrirModalAgregar() {
         Swal.fire({
             title: 'Agregar Autor',
             html: `
-                <input id="nombre" class="swal2-input" placeholder="Nombre">
-                <input id="nacionalidad" class="swal2-input" placeholder="Nacionalidad">
-                <input id="fechaNacido" type="date" class="swal2-input" placeholder="Fecha de nacimiento">
+                <input id="nombre" class="${swalInputClass}" placeholder="Nombre del autor">
+                <input id="nacionalidad" class="${swalInputClass}" placeholder="Nacionalidad">
+                <input id="fechaNacido" type="date" class="${swalInputClass}" placeholder="Fecha de nacimiento">
+                <input id="imagenArchivo" type="file" class="swal2-file block w-full max-w-xs mx-auto rounded-xl">
             `,
-            confirmButtonText: 'Guardar',
+            confirmButtonText: 'Agregar',
+            confirmButtonColor: '#dc2626',
             focusConfirm: false,
             preConfirm: () => {
                 const nombre = Swal.getPopup().querySelector('#nombre').value
                 const nacionalidad = Swal.getPopup().querySelector('#nacionalidad').value
                 const fechaNacido = Swal.getPopup().querySelector('#fechaNacido').value
+                const imagenArchivo = Swal.getPopup().querySelector('#imagenArchivo').files[0] || null
                 if (!nombre || !nacionalidad || !fechaNacido) Swal.showValidationMessage("Complete todos los campos")
-                return { nombre, nacionalidad, fechaNacido }
+                return { nombre, nacionalidad, fechaNacido, imagenArchivo }
             }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '/user/autores/agregar';
+        }).then(result => {
+            if(result.isConfirmed){
+                const formData = new FormData();
+                formData.append('_csrf', csrfToken);
+                formData.append('nombre', result.value.nombre);
+                formData.append('nacionalidad', result.value.nacionalidad);
+                formData.append('fechaNacido', result.value.fechaNacido);
+                if(result.value.imagenArchivo) formData.append('imagen', result.value.imagenArchivo);
 
-                const csrf = document.createElement('input');
-                csrf.type = 'hidden';
-                csrf.name = '_csrf';
-                csrf.value = csrfToken;
-                form.appendChild(csrf);
-
-                for (const key in result.value) {
-                    const input = document.createElement('input');
-                    input.name = key;
-                    input.value = result.value[key];
-                    form.appendChild(input);
-                }
-
-                document.body.appendChild(form);
-                form.submit();
+                fetch('/user/autores/agregar', { method: 'POST', body: formData })
+                    .then(() => Swal.fire('Éxito','Autor agregado','success').then(()=>location.reload()))
+                    .catch(() => Swal.fire('Error','No se pudo guardar el autor','error'));
             }
         });
     }
 
-    // Modal editar
     function abrirModalEditar(id) {
         fetch(`/user/autores/editar/${id}`)
             .then(res => res.json())
@@ -116,49 +116,69 @@
                 Swal.fire({
                     title: 'Editar Autor',
                     html: `
-                        <input id="nombre" class="swal2-input" placeholder="Nombre" value="${data.nombre}">
-                        <input id="nacionalidad" class="swal2-input" placeholder="Nacionalidad" value="${data.nacionalidad}">
-                        <input id="fechaNacido" type="date" class="swal2-input" placeholder="Fecha de nacimiento" value="${data.fechaNacido}">
+                        <input id="nombre" class="${swalInputClass}" placeholder="Nombre del autor" value="${data.nombre}">
+                        <input id="nacionalidad" class="${swalInputClass}" placeholder="Nacionalidad" value="${data.nacionalidad}">
+                        <input id="fechaNacido" type="date" class="${swalInputClass}" value="${data.fechaNacido}">
+                        <input id="imagenArchivo" type="file" class="swal2-file block w-full max-w-xs mx-auto rounded-xl">
                     `,
                     confirmButtonText: 'Actualizar',
+                    confirmButtonColor: '#dc2626',
                     focusConfirm: false,
                     preConfirm: () => {
                         const nombre = Swal.getPopup().querySelector('#nombre').value
                         const nacionalidad = Swal.getPopup().querySelector('#nacionalidad').value
                         const fechaNacido = Swal.getPopup().querySelector('#fechaNacido').value
-                        if (!nombre || !nacionalidad || !fechaNacido) Swal.showValidationMessage("Complete todos los campos")
-                        return { nombre, nacionalidad, fechaNacido }
+                        const imagenArchivo = Swal.getPopup().querySelector('#imagenArchivo').files[0] || null
+                        if(!nombre || !nacionalidad || !fechaNacido) Swal.showValidationMessage("Complete todos los campos")
+                        return { nombre, nacionalidad, fechaNacido, imagenArchivo }
                     }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        const form = document.createElement('form');
-                        form.method = 'POST';
-                        form.action = `/user/autores/editar/${id}`;
+                }).then(result => {
+                    if(result.isConfirmed){
+                        const formData = new FormData();
+                        formData.append('_csrf', csrfToken);
+                        formData.append('nombre', result.value.nombre);
+                        formData.append('nacionalidad', result.value.nacionalidad);
+                        formData.append('fechaNacido', result.value.fechaNacido);
+                        if(result.value.imagenArchivo) formData.append('imagen', result.value.imagenArchivo);
 
-                        const csrf = document.createElement('input');
-                        csrf.type = 'hidden';
-                        csrf.name = '_csrf';
-                        csrf.value = csrfToken;
-                        form.appendChild(csrf);
-
-                        for (const key in result.value) {
-                            const input = document.createElement('input');
-                            input.name = key;
-                            input.value = result.value[key];
-                            form.appendChild(input);
-                        }
-
-                        document.body.appendChild(form);
-                        form.submit();
+                        fetch(`/user/autores/editar/${id}`, { method: 'POST', body: formData })
+                            .then(() => Swal.fire('Éxito','Autor actualizado','success').then(()=>location.reload()))
+                            .catch(() => Swal.fire('Error','No se pudo actualizar el autor','error'));
                     }
                 });
             })
-            .catch(err => {
-                Swal.fire('Error', 'No se pudo obtener los datos del autor', 'error');
-                console.error(err);
-            });
+            .catch(() => Swal.fire('Error','No se pudo obtener los datos del autor','error'));
+    }
+
+    function eliminarAutor(id) {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "¡No podrás revertir esto!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`/user/autores/eliminar/${id}`, {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': csrfToken }
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        if(data.status === "ok") {
+                            Swal.fire('Eliminado!', 'El autor ha sido eliminado.', 'success')
+                                .then(() => location.reload());
+                        } else {
+                            Swal.fire('Error','No se pudo eliminar el autor','error');
+                        }
+                    })
+                    .catch(() => Swal.fire('Error','No se pudo eliminar el autor','error'));
+            }
+        });
     }
 </script>
-
 </body>
 </html>

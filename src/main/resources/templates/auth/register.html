@@ -18,12 +18,11 @@
             <h1 class="text-red-500 font-bold text-2xl mb-10 mt-10">Registrarse</h1>
 
             <!-- ERRORES GENERALES -->
-            <div th:if="${errorMessage}" class="w-full lg:w-2/5 bg-red-100 text-red-700 p-4 rounded mb-4 text-sm">
+            <div th:if="${errorMessage}" class="w-full lg:w-3/5 bg-red-100 text-red-700 p-4 rounded mb-4 text-sm">
                 <span th:text="${errorMessage}"></span>
             </div>
 
             <!-- FORMULARIO -->
-            <!-- FORMULARIO REGISTRO -->
             <form th:action="@{/auth/register}" th:object="${user}" method="POST"
                   class="w-4/5 lg:flex flex-col items-center max-w-lg mx-auto bg-white shadow-lg rounded-lg p-8 space-y-4">
 
@@ -31,32 +30,32 @@
 
                 <!-- Campo Nombres -->
                 <input type="text" th:field="*{nombre}" placeholder="Nombres"
-                       class="block w-full p-2 border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent mb-2 lg:w-2/5" />
-                <div th:if="${#fields.hasErrors('nombre')}" class="w-full lg:w-2/5 text-red-500 text-sm mb-2 -mt-1">
+                       class="block w-full p-2 border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent mb-2 lg:w-3/5" />
+                <div th:if="${#fields.hasErrors('nombre')}" class="w-full lg:w-3/5 text-red-500 text-sm mb-2 -mt-1">
                     <span th:errors="*{nombre}"></span>
                 </div>
 
                 <!-- Campo Apellidos -->
                 <input type="text" th:field="*{apellido}" placeholder="Apellidos"
-                       class="block w-full p-2 border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent mb-2 lg:w-2/5" />
-                <div th:if="${#fields.hasErrors('apellido')}" class="w-full lg:w-2/5 text-red-500 text-sm mb-2 -mt-1">
+                       class="block w-full p-2 border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent mb-2 lg:w-3/5" />
+                <div th:if="${#fields.hasErrors('apellido')}" class="w-full lg:w-3/5 text-red-500 text-sm mb-2 -mt-1">
                     <span th:errors="*{apellido}"></span>
                 </div>
 
                 <!-- Campo Email -->
                 <input type="email" th:field="*{email}" placeholder="Email"
-                       class="block w-full p-2 border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent mb-2 lg:w-2/5" />
-                <div th:if="${#fields.hasErrors('email')}" class="w-full lg:w-2/5 text-red-500 text-sm mb-2 -mt-1">
+                       class="block w-full p-2 border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent mb-2 lg:w-3/5" />
+                <div th:if="${#fields.hasErrors('email')}" class="w-full lg:w-3/5 text-red-500 text-sm mb-2 -mt-1">
                     <span th:errors="*{email}"></span>
                 </div>
 
                 <!-- Campo Contraseña -->
-                <div class="relative w-full lg:w-2/5 mb-2">
+                <div class="relative w-full lg:w-3/5 mb-2">
                     <input type="password" th:field="*{password}" id="password" placeholder="Contraseña"
                            class="block w-full p-2 border border-gray-300 rounded-md pr-10 outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent" />
                     <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer"
                             onclick="togglePassword('password')">
-                        <svg id="see_password_img" class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                   d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -64,17 +63,17 @@
                         </svg>
                     </button>
                 </div>
-                <div th:if="${#fields.hasErrors('password')}" class="w-full lg:w-2/5 text-red-500 text-sm mb-2 -mt-1">
+                <div th:if="${#fields.hasErrors('password')}" class="w-full lg:w-3/5 text-red-500 text-sm mb-2 -mt-1">
                     <span th:errors="*{password}"></span>
                 </div>
 
                 <!-- Campo Confirmar Contraseña -->
-                <div class="relative w-full lg:w-2/5 mb-2">
+                <div class="relative w-full lg:w-3/5 mb-2">
                     <input type="password" th:field="*{confirmPassword}" id="confirmPassword" placeholder="Confirmar Contraseña"
                            class="block w-full p-2 border border-gray-300 rounded-md pr-10 outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent" />
                     <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer"
                             onclick="togglePassword('confirmPassword')">
-                        <svg id="see_confirm_password_img" class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                   d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -82,18 +81,17 @@
                         </svg>
                     </button>
                 </div>
-                <div th:if="${#fields.hasErrors('confirmPassword')}" class="w-full lg:w-2/5 text-red-500 text-sm mb-2 -mt-1">
+                <div th:if="${#fields.hasErrors('confirmPassword')}" class="w-full lg:w-3/5 text-red-500 text-sm mb-2 -mt-1">
                     <span th:errors="*{confirmPassword}"></span>
                 </div>
 
                 <!-- Botón Registrarse -->
                 <button type="submit"
-                        class="w-full p-2 rounded-md bg-red-500 text-white font-bold lg:w-2/5 hover:bg-red-600 transition-colors duration-200">
+                        class="w-full p-2 rounded-md bg-red-500 text-white font-bold lg:w-3/5 hover:bg-red-600 transition-colors duration-200">
                     Registrarse
                 </button>
 
             </form>
-
 
             <p class="my-8">
                 ¿Ya posees una cuenta?
@@ -118,17 +116,8 @@
 <script>
     function togglePassword(fieldId) {
         const passwordInput = document.getElementById(fieldId);
-        if (passwordInput.type === 'password') {
-            passwordInput.type = 'text';
-        } else {
-            passwordInput.type = 'password';
-        }
+        passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
     }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const nombreInput = document.querySelector('input[th\\:field="*{nombre}"]');
-        if(nombreInput) nombreInput.focus();
-    });
 </script>
 </body>
 </html>

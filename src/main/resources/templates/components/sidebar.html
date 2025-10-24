@@ -21,24 +21,31 @@
                 </a>
             </li>
             <li>
-                <a th:href="@{/user/libros}" class="flex items-center px-6 py-3 rounded-xl hover:bg-red-200 hover:shadow-md">
+                <a th:href="@{/user/misLibros}" class="flex items-center px-6 py-3 rounded-xl hover:bg-red-200 hover:shadow-md">
                     <img class="h-6 w-6 mr-3" th:src="@{/svg/bookmark.svg}" alt="Mis Libros" />
                     <span class="font-medium">Mis Libros</span>
                 </a>
             </li>
             <li>
-                <!-- CORRECCIÓN: apunta a /user/libros/favoritos -->
-                <a th:href="@{/user/libros/favoritos}" class="flex items-center px-6 py-3 rounded-xl hover:bg-red-200 hover:shadow-md">
+                <a th:href="@{/user/agregar}" class="flex items-center px-6 py-3 rounded-xl hover:bg-red-200 hover:shadow-md">
+                    <img class="h-6 w-6 mr-3" th:src="@{/svg/square-plus.svg}" alt="Agregar" />
+                    <span class="font-medium">Agregar</span>
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/user/favoritos}" class="flex items-center px-6 py-3 rounded-xl hover:bg-red-200 hover:shadow-md">
                     <img class="h-6 w-6 mr-3" th:src="@{/svg/gift.svg}" alt="Favoritos" />
                     <span class="font-medium">Favoritos</span>
                 </a>
             </li>
             <li>
-                <a th:href="@{/user/autores}" class="flex items-center px-6 py-3 rounded-xl hover:bg-red-200 hover:shadow-md">
+                <a th:href="@{/user/autores}"
+                   class="flex items-center px-6 py-3 rounded-xl hover:bg-red-200 hover:shadow-md">
                     <img class="h-6 w-6 mr-3" th:src="@{/svg/id.svg}" alt="Autores" />
                     <span class="font-medium">Autores</span>
                 </a>
             </li>
+
             <li>
                 <a th:href="@{/user/categorias}" class="flex items-center px-6 py-3 rounded-xl hover:bg-red-200 hover:shadow-md">
                     <img class="h-6 w-6 mr-3" th:src="@{/svg/category-2.svg}" alt="Categorías" />
