@@ -25,13 +25,13 @@ public class AuthController {
     public String registrarUsuario(@ModelAttribute("user") UsuarioRegistroDto userDto, Model model) {
         try {
             usuarioService.registrarUsuario(userDto);
-            model.addAttribute("successMessage", "Registro exitoso. Ahora puedes iniciar sesión.");
-            model.addAttribute("user", new UsuarioRegistroDto());
+            // ✅ Redirige al login después de registrar correctamente
+            return "redirect:/auth/login";
         } catch (Exception e) {
             model.addAttribute("errorMessage", e.getMessage());
             model.addAttribute("user", userDto);
+            return "auth/register";
         }
-        return "auth/register";
     }
 
     @GetMapping("/auth/login")
