@@ -66,7 +66,7 @@ public class LibroController {
         return "{\"status\":\"ok\",\"favorito\":" + libro.isFavorito() + "}";
     }
 
-    // 📖 Listar libros favoritos
+    // 📚 Listar libros favoritos
     @GetMapping("/favoritos")
     public String listarFavoritos(Model model) {
         Usuario user = obtenerUsuarioAutenticado();
@@ -75,7 +75,7 @@ public class LibroController {
         List<Libro> favoritos = libroService.listarFavoritos(user);
         model.addAttribute("libros", favoritos);
 
-        return "libros/librosFav"; // Debe existir: src/main/resources/templates/libros/librosFav.html
+        return "libros/librosFav";
     }
 
     // ➕ Agregar nuevo libro
@@ -117,6 +117,41 @@ public class LibroController {
             e.printStackTrace();
             return "{\"status\":\"error\"}";
         }
+    }
+
+    // ➖ Eliminar libro
+    @PostMapping("/eliminar/{id}")
+    @ResponseBody
+    public String eliminarLibro(@PathVariable Long id) {
+        Usuario user = obtenerUsuarioAutenticado();
+        if (user == null) return "{\"status\":\"error\",\"message\":\"Usuario no autenticado\"}";
+
+        Libro libro = libroService.obtenerPorId(id).orElse(null);
+        if (libro == null) return "{\"status\":\"not_found\",\"message\":\"Libro no encontrado\"}";
+
+        // Verificar que el libro pertenece al usuario
+        if (!libro.getUser().getId().equals(user.getId())) {
+            return "{\"status\":\"error\",\"message\":\"No tienes permisos para eliminar este libro\"}";
+        }
+
+        // ❌ Eliminar imagen si existe
+        if (libro.getImagen() != null && !libro.getImagen().isEmpty()) {
+            try {
+                // la ruta en el sistema de archivos (quitar el "/uploads/" inicial si es relativo)
+                Path rutaImagen = Paths.get("uploads").resolve(Paths.get(libro.getImagen()).getFileName());
+                if (Files.exists(rutaImagen)) {
+                    Files.delete(rutaImagen);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                return "{\"status\":\"error\",\"message\":\"No se pudo eliminar la imagen del libro\"}";
+            }
+        }
+
+        // Eliminar el registro de la base de datos
+        libroService.eliminar(id);
+
+        return "{\"status\":\"ok\"}";
     }
 
     // 🔑 Método helper para obtener el usuario autenticado

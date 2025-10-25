@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -24,10 +23,15 @@
         <div class="container mx-auto p-4">
             <header class="flex justify-between items-center mb-8">
                 <h1 class="text-4xl font-bold text-gray-800">Mis Libros</h1>
-                <button id="btnAgregarLibro"
-                        class="px-6 py-3 bg-red-600 text-white rounded-xl shadow hover:bg-red-700">
-                    Agregar Libro
-                </button>
+                <div class="flex space-x-4">
+                    <button id="btnAgregarLibro"
+                            class="px-6 py-3 bg-red-600 text-white rounded-xl shadow hover:bg-red-700">
+                        Agregar Libro
+                    </button>
+                    <a href="/user/libros/about" class="px-6 py-3 bg-blue-600 text-white rounded-xl shadow hover:bg-blue-700">
+                        About
+                    </a>
+                </div>
             </header>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -81,7 +85,6 @@
     const autores = /*[[${autores}]]*/ [];
     const categorias = /*[[${categorias}]]*/ [];
 
-    // CSRF
     const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
     const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
@@ -148,7 +151,7 @@
         });
     });
 
-    // 🗑️ Eliminar libro
+    // 🗑️ Eliminar libro (ahora usa POST)
     document.querySelectorAll('.btn-eliminar-libro').forEach(button => {
         button.addEventListener('click', () => {
             const libroId = button.getAttribute('data-id');
@@ -213,6 +216,5 @@
         });
     });
 </script>
-
 </body>
 </html>

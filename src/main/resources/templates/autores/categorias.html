@@ -22,7 +22,7 @@
                 <input type="text" name="buscar" placeholder="Buscar..."
                        class="border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-red-600">
             </form>
-            <button onclick="abrirModalAgregar()"
+            <button onclick="abrirModal(null)"
                     class="bg-red-600 text-white py-2 px-6 rounded-lg hover:bg-red-700 shadow-md transition duration-300">
                 AGREGAR
             </button>
@@ -43,7 +43,7 @@
             <!-- Botones -->
             <div class="flex justify-end space-x-2 mt-3">
                 <button type="button"
-                        th:onclick="'abrirModalEditar(' + ${categoria.id} + ')'"
+                        th:onclick="'abrirModal(' + ${categoria.id} + ')'"
                         class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-xl shadow-md transition duration-200">
                     Editar
                 </button>
@@ -68,85 +68,57 @@
         const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
         const swalInputClass = 'swal2-input block w-full max-w-xs px-4 py-2 border border-gray-300 rounded-xl shadow-md focus:outline-none focus:ring-2 focus:ring-red-500 transition duration-200 mx-auto';
 
-        // ABRIR MODAL AGREGAR
-        window.abrirModalAgregar = function() {
-            Swal.fire({
-                title: 'Agregar Categoría',
-                html: `
-                <input id="nombre" class="${swalInputClass}" placeholder="Nombre de la categoría">
-                <input id="descripcion" class="${swalInputClass}" placeholder="Descripción">
-                <input id="codigo" class="${swalInputClass}" placeholder="Código">
-                <input id="tipo" class="${swalInputClass}" placeholder="Tipo">
-            `,
-                confirmButtonText: 'Agregar',
-                confirmButtonColor: '#dc2626',
-                focusConfirm: false,
-                preConfirm: () => {
-                    const nombre = Swal.getPopup().querySelector('#nombre').value;
-                    const descripcion = Swal.getPopup().querySelector('#descripcion').value;
-                    const codigo = Swal.getPopup().querySelector('#codigo').value;
-                    const tipo = Swal.getPopup().querySelector('#tipo').value;
-                    if(!nombre || !descripcion || !codigo || !tipo) Swal.showValidationMessage("Complete todos los campos");
-                    return { nombre, descripcion, codigo, tipo };
-                }
-            }).then(result => {
-                if(result.isConfirmed){
-                    const formData = new FormData();
-                    formData.append('_csrf', csrfToken);
-                    formData.append('nombre', result.value.nombre);
-                    formData.append('descripcion', result.value.descripcion);
-                    formData.append('codigo', result.value.codigo);
-                    formData.append('tipo', result.value.tipo);
+        // FUNCION UNIFICADA AGREGAR / EDITAR
+        window.abrirModal = function(id) {
+            let urlFetch = id ? `/user/categorias/editar/${id}` : null;
 
-                    fetch('/user/categorias/guardar', { method: 'POST', body: formData })
-                        .then(res => res.ok ? res.text() : Promise.reject())
-                        .then(() => Swal.fire('Éxito','Categoría agregada','success').then(()=>location.reload()))
-                        .catch(() => Swal.fire('Error','No se pudo guardar la categoría','error'));
-                }
-            });
-        }
+            if (id) {
+                // Editar: obtener datos
+                fetch(urlFetch)
+                    .then(res => res.json())
+                    .then(data => abrirSwal(data))
+                    .catch(() => Swal.fire('Error','No se pudo obtener los datos de la categoría','error'));
+            } else {
+                abrirSwal({ nombre: '', descripcion: '', codigo: '', tipo: '' });
+            }
 
-        // ABRIR MODAL EDITAR
-        window.abrirModalEditar = function(id) {
-            fetch(`/user/categorias/editar/${id}`)
-                .then(res => res.json())
-                .then(data => {
-                    Swal.fire({
-                        title: 'Editar Categoría',
-                        html: `
-                        <input id="nombre" class="${swalInputClass}" placeholder="Nombre de la categoría" value="${data.nombre}">
-                        <input id="descripcion" class="${swalInputClass}" placeholder="Descripción" value="${data.descripcion}">
-                        <input id="codigo" class="${swalInputClass}" placeholder="Código" value="${data.codigo}">
-                        <input id="tipo" class="${swalInputClass}" placeholder="Tipo" value="${data.tipo}">
-                    `,
-                        confirmButtonText: 'Actualizar',
-                        confirmButtonColor: '#dc2626',
-                        focusConfirm: false,
-                        preConfirm: () => {
-                            const nombre = Swal.getPopup().querySelector('#nombre').value;
-                            const descripcion = Swal.getPopup().querySelector('#descripcion').value;
-                            const codigo = Swal.getPopup().querySelector('#codigo').value;
-                            const tipo = Swal.getPopup().querySelector('#tipo').value;
-                            if(!nombre || !descripcion || !codigo || !tipo) Swal.showValidationMessage("Complete todos los campos");
-                            return { nombre, descripcion, codigo, tipo };
-                        }
-                    }).then(result => {
-                        if(result.isConfirmed){
-                            const formData = new FormData();
-                            formData.append('_csrf', csrfToken);
-                            formData.append('nombre', result.value.nombre);
-                            formData.append('descripcion', result.value.descripcion);
-                            formData.append('codigo', result.value.codigo);
-                            formData.append('tipo', result.value.tipo);
+            function abrirSwal(data) {
+                Swal.fire({
+                    title: id ? 'Editar Categoría' : 'Agregar Categoría',
+                    html: `
+                    <input id="nombre" class="${swalInputClass}" placeholder="Nombre" value="${data.nombre}">
+                    <input id="descripcion" class="${swalInputClass}" placeholder="Descripción" value="${data.descripcion}">
+                    <input id="codigo" class="${swalInputClass}" placeholder="Código" value="${data.codigo}">
+                    <input id="tipo" class="${swalInputClass}" placeholder="Tipo" value="${data.tipo}">
+                `,
+                    confirmButtonText: id ? 'Actualizar' : 'Agregar',
+                    confirmButtonColor: '#dc2626',
+                    focusConfirm: false,
+                    preConfirm: () => {
+                        const nombre = Swal.getPopup().querySelector('#nombre').value;
+                        const descripcion = Swal.getPopup().querySelector('#descripcion').value;
+                        const codigo = Swal.getPopup().querySelector('#codigo').value;
+                        const tipo = Swal.getPopup().querySelector('#tipo').value;
+                        if(!nombre || !descripcion || !codigo || !tipo) Swal.showValidationMessage("Complete todos los campos");
+                        return { nombre, descripcion, codigo, tipo };
+                    }
+                }).then(result => {
+                    if(result.isConfirmed){
+                        const formData = new FormData();
+                        formData.append('nombre', result.value.nombre);
+                        formData.append('descripcion', result.value.descripcion);
+                        formData.append('codigo', result.value.codigo);
+                        formData.append('tipo', result.value.tipo);
 
-                            fetch(`/user/categorias/editar/${id}`, { method: 'POST', body: formData })
-                                .then(res => res.ok ? res.text() : Promise.reject())
-                                .then(() => Swal.fire('Éxito','Categoría actualizada','success').then(()=>location.reload()))
-                                .catch(() => Swal.fire('Error','No se pudo actualizar la categoría','error'));
-                        }
-                    });
-                })
-                .catch(() => Swal.fire('Error','No se pudo obtener los datos de la categoría','error'));
+                        let url = id ? `/user/categorias/editar/${id}` : `/user/categorias/guardar`;
+
+                        fetch(url, { method: 'POST', headers: { 'X-CSRF-TOKEN': csrfToken }, body: formData })
+                            .then(res => res.ok ? res.text() : Promise.reject())
+                            .then(() => Swal.fire('Éxito', id ? 'Categoría actualizada' : 'Categoría agregada', 'success').then(()=>location.reload()))
+                            .catch(() => Swal.fire('Error','No se pudo guardar la categoría','error'));
+                    }
+                });
+            }
         }
 
         // ELIMINAR CATEGORÍA
